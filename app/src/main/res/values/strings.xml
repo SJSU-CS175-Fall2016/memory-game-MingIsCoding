@@ -3,7 +3,7 @@
     <string name="greeting">Welcome to Memory Game</string>
     <string name="btn_play">PLAY</string>
     <string name="btn_rule">RULES</string>
-    <string name="point">Point:%1$s</string>
+    <string name="point">Points:%1$s</string>
     <string name="game_rules">1. There are 20 tiles. Hidden below these tiles are 10 random images each repeated twice.\n
                               2. The user can touch on any two tiles. Touching on a tile will show the image.\n
                               3. If the two tiles have matching images, they disappear. The user gets a point.\n

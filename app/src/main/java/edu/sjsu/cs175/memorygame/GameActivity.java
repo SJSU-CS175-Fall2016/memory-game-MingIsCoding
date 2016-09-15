@@ -107,23 +107,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         System.out.println("mGamePanel.getOrientation():"+mGamePanel.getOrientation());
         System.out.println("cols:"+mGamePanel.getColumnCount());
         System.out.println("rows:"+mGamePanel.getRowCount());
-        if(!mIsScreenLandscape) {
+        //if(!mIsScreenLandscape) {
             for (int r = 0; r < mPanelRowCount; r++) {
                 for (int c = 0; c < mPanelColCount; c++) {
                     System.out.println("kids:"+mGamePanel.getChildCount());
-                    System.out.println("portrait:"+r+"-"+c);
+                    System.out.print("portrait:"+r+"-"+c);
+                    System.out.print("\t"+AppData.mIconButtonsArray[r][c].getIconCode()+"\n");
                     mGamePanel.addView(AppData.mIconButtonsArray[r][c]);
                 }
             }
-        }else { // landscape
+        /*}else { // landscape
             for (int c = mPanelColCount - 1; c >= 0 ; c--) {
                 for (int r = 0; r < mPanelRowCount; r++) {
                     System.out.println("kids:"+mGamePanel.getChildCount());
-                    System.out.println("landscape:"+r+"-"+c);
+                    System.out.print("landscape:"+r+"-"+c);
+                    System.out.print("\t"+AppData.mIconButtonsArray[r][c].getIconCode());
                     mGamePanel.addView(AppData.mIconButtonsArray[r][c]);
                 }
             }
-        }
+        }*/
         clickedIconQueue = new LinkedList<IconButton>();
     }
     private void endGame(){
@@ -173,21 +175,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void buildGamePanel(){
         AppData.mIconButtonsArray = new IconButton[mPanelRowCount][mPanelColCount];
         mGamePanel.removeAllViews();
-        if(!mIsScreenLandscape){
+        //if(!mIsScreenLandscape){
             for(int i = 0; i < mPanelRowCount; i++){
                 for(int j = 0; j<mPanelColCount; j++){
                     AppData.mIconButtonsArray[i][j] = generateOneIconBtn();
                     mGamePanel.addView(AppData.mIconButtonsArray[i][j]);
                 }
             }
-        }else {
+        /*}else {
             for(int i = mPanelRowCount - 1; i >= 0 ; i--){
                 for(int j = 0; j<mPanelColCount; j++){
                     AppData.mIconButtonsArray[i][j] = generateOneIconBtn();
                     mGamePanel.addView(AppData.mIconButtonsArray[i][j]);
                 }
             }
-        }
+        }*/
 
     }
     private IconButton generateOneIconBtn(){
@@ -245,7 +247,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         alertDialogBuilder.setPositiveButton("resume", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                Toast.makeText(GameActivity.this,"You clicked yes button",Toast.LENGTH_LONG).show();
+                Toast.makeText(GameActivity.this,"Your game has been resumed.",Toast.LENGTH_LONG).show();
                 resumeGame();
             }
         });
