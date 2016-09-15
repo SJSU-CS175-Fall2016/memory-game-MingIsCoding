@@ -1,11 +1,13 @@
 package edu.sjsu.cs175.memorygame;
 
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
@@ -13,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -37,24 +40,40 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private Stack<Integer> mIconShuffledStack;
 //    private int mScore = 0;
     private Queue<IconButton> clickedIconQueue;
-    private final static int mPanelWidth = 5, mPanelLength = 4;
+    private final static int mPanelColCount = 4, mPanelRowCount = 5;
     private TextView mScoreTextView;
     private List<Integer> mIconResourceList;
     private float scale;
-    private static int BLOCK_WIDTH = 90;
+    private static int BLOCK_WIDTH = 70;
+    private boolean mIsScreenLandscape = false;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            mIsScreenLandscape = true;
+
+            setContentView(R.layout.activity_game_landscape);
+        }else {
+            mIsScreenLandscape = false;
+            setContentView(R.layout.activity_game);
+        }
+
+        System.out.println("mIsScreenLandscape:"+mIsScreenLandscape);
         initViews();
         initData();
-        if(AppData.isStarted)
-            openDialog();
-        else
-            startNewGame();
+        if(AppData.isStarted && AppData.lastOrientation != getResources().getConfiguration().orientation){
+            resumeGame();
+        }else{
+            if (AppData.isStarted)
+                openDialog();
+            else
+                startNewGame();
+        }
+        AppData.lastOrientation = getResources().getConfiguration().orientation;
 
     }
     private void initViews(){
@@ -84,9 +103,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void resumeGame(){
         mScoreTextView.setText(String.format(getString(R.string.point),AppData.score));
-        for(int i = 0; i < mPanelWidth; i++){
-            for(int j = 0; j<mPanelLength; j++){
-                mGamePanel.addView(AppData.mIconButtonsArray[i][j]);
+        mGamePanel.removeAllViews();
+        System.out.println("mGamePanel.getOrientation():"+mGamePanel.getOrientation());
+        System.out.println("cols:"+mGamePanel.getColumnCount());
+        System.out.println("rows:"+mGamePanel.getRowCount());
+        if(!mIsScreenLandscape) {
+            for (int r = 0; r < mPanelRowCount; r++) {
+                for (int c = 0; c < mPanelColCount; c++) {
+                    System.out.println("kids:"+mGamePanel.getChildCount());
+                    System.out.println("portrait:"+r+"-"+c);
+                    mGamePanel.addView(AppData.mIconButtonsArray[r][c]);
+                }
+            }
+        }else { // landscape
+            for (int c = mPanelColCount - 1; c >= 0 ; c--) {
+                for (int r = 0; r < mPanelRowCount; r++) {
+                    System.out.println("kids:"+mGamePanel.getChildCount());
+                    System.out.println("landscape:"+r+"-"+c);
+                    mGamePanel.addView(AppData.mIconButtonsArray[r][c]);
+                }
             }
         }
         clickedIconQueue = new LinkedList<IconButton>();
@@ -114,24 +149,36 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         mIconResourceList.add(R.drawable.icon_regular_biking);
     }
     private void buildGamePanel(){
-        AppData.mIconButtonsArray = new IconButton[mPanelWidth][mPanelLength];
-        for(int i = 0; i < mPanelWidth; i++){
-            for(int j = 0; j<mPanelLength; j++){
-                IconButton b = new IconButton(getApplicationContext());
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.height = (int)(BLOCK_WIDTH * scale + 0.5f);
-                params.width = (int)(BLOCK_WIDTH * scale + 0.5f);
-                params.setMargins(5,5,5,5);
-                b.setLayoutParams(params);
-                b.setOnClickListener(this);
-                b.setIconCode(mIconShuffledStack.pop());
-                b.setBackground(getDrawable(R.drawable.icon_cover));
-                AppData.mIconButtonsArray[i][j] = b;
-                mGamePanel.addView(b);
+        AppData.mIconButtonsArray = new IconButton[mPanelRowCount][mPanelColCount];
+        if(!mIsScreenLandscape){
+            for(int i = 0; i < mPanelRowCount; i++){
+                for(int j = 0; j<mPanelColCount; j++){
+                    AppData.mIconButtonsArray[i][j] = generateOneIconBtn();
+                    mGamePanel.addView(AppData.mIconButtonsArray[i][j]);
+                }
+            }
+        }else {
+            for(int i = mPanelRowCount - 1; i >= 0 ; i--){
+                for(int j = 0; j<mPanelColCount; j++){
+                    AppData.mIconButtonsArray[i][j] = generateOneIconBtn();
+                    mGamePanel.addView(AppData.mIconButtonsArray[i][j]);
+                }
             }
         }
-    }
 
+    }
+    private IconButton generateOneIconBtn(){
+        IconButton b = new IconButton(getApplicationContext());
+        GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+        params.height = (int)(BLOCK_WIDTH * scale + 0.5f);
+        params.width = (int)(BLOCK_WIDTH * scale + 0.5f);
+        params.setMargins(5,5,5,5);
+        b.setLayoutParams(params);
+        b.setOnClickListener(this);
+        b.setIconCode(mIconShuffledStack.pop());
+        b.setBackground(getDrawable(R.drawable.icon_cover));
+        return b;
+    }
     private void checkClick(){
         List ibs= new ArrayList(clickedIconQueue);
         IconButton ibEarly = (IconButton)ibs.get(0);
@@ -172,7 +219,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Do you want to resume your last game?");
 
-        alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("resume", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 Toast.makeText(GameActivity.this,"You clicked yes button",Toast.LENGTH_LONG).show();
@@ -180,7 +227,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        alertDialogBuilder.setNegativeButton("No,start a new game",new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton("Restart",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 startNewGame();
@@ -192,9 +239,27 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         alertDialog.show();
     }
 
+    /*@Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+
+    }*/
+
     @Override
     protected void onPause() {
         super.onPause();
         mGamePanel.removeAllViews();
     }
+
+    /*@Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        System.out.println("newConfig.orientation: "+newConfig.orientation);
+        System.out.println("current:"+ (AppData.isPortrait? "Portrait":"Landscape"));
+        AppData.isOrientationChanged = true;
+    }*/
+    /*public void  onSaveInstanceState()  {
+        super.onPause();
+
+    }*/
 }

@@ -18,7 +18,6 @@ public class FlipTask extends AsyncTask {
     protected Object doInBackground(Object[] objects) {
 //        int time = Integer.parseInt(objects[0]);
         try {
-            System.out.println("start to sleep");
             Thread.sleep(700);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -29,7 +28,6 @@ public class FlipTask extends AsyncTask {
 
     @Override
     protected void onProgressUpdate(Object[] values) {
-        System.out.println("update");
         ib.setBackground(defaultIcon);
         super.onProgressUpdate(values);
 
