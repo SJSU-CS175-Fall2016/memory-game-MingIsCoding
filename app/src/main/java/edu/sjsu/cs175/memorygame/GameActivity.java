@@ -128,6 +128,28 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
     private void endGame(){
         AppData.isStarted = false;
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("You Win! Start a new game?");
+
+        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                Toast.makeText(GameActivity.this,"New game started.",Toast.LENGTH_LONG).show();
+                startNewGame();
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
+
     }
     private void addResourcesToQueue(){
         Collections.shuffle(mIconResourceList);
@@ -150,6 +172,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
     private void buildGamePanel(){
         AppData.mIconButtonsArray = new IconButton[mPanelRowCount][mPanelColCount];
+        mGamePanel.removeAllViews();
         if(!mIsScreenLandscape){
             for(int i = 0; i < mPanelRowCount; i++){
                 for(int j = 0; j<mPanelColCount; j++){
