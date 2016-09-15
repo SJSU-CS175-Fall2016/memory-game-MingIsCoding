@@ -1,5 +1,5 @@
 Welcome to play my game.
-Features have been archeived:
+Features have been archeived:<b/>
 1.All the user game data is kept, when come back from other activites.
 2.Asks the user if he/she wants to restart a game when there is a game running.
 3.Separated layouts for portrait and landscape screen
