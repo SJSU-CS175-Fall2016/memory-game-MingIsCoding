@@ -256,7 +256,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 startNewGame();
-                finish();
+                //finish();
             }
         });
 
