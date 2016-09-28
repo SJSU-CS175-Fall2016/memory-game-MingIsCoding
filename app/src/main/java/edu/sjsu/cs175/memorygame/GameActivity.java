@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.PersistableBundle;
@@ -15,13 +16,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +52,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private float scale;
     private static int BLOCK_WIDTH = 70;
     private boolean mIsScreenLandscape = false;
+    private static final String TAG = "GameActivity";
 
 
 
@@ -153,6 +160,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
+    private void shuffleTheBlocks(){
+        List<IconButton> checkedBlocks = new ArrayList<IconButton>();
+        mGamePanel.removeAllViews();
+        //if(!mIsScreenLandscape){
+        for(int i = 0; i < mPanelRowCount; i++){
+            for(int j = 0; j<mPanelColCount; j++){
+                //generatedBlocks.add(AppData.mIconButtonsArray[i][j]);
+                Log.d(TAG,AppData.mIconButtonsArray[i][j].getVisibility()+"");
+                if(AppData.mIconButtonsArray[i][j].getVisibility() == View.VISIBLE){
+                    mGamePanel.addView(AppData.mIconButtonsArray[i][j]);
+                }else {
+                    checkedBlocks.add(AppData.mIconButtonsArray[i][j]);
+                }
+            }
+        }
+        for(IconButton ib: checkedBlocks){
+            mGamePanel.addView(ib);
+        }
+        clickedIconQueue = new LinkedList<IconButton>();
+    }
     private void addResourcesToQueue(){
         Collections.shuffle(mIconResourceList);
         for(Integer code : mIconResourceList){
@@ -224,7 +251,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         IconButton ib = (IconButton)view;
+
         ib.setBackground(getDrawable(ib.getIconCode()));
+
         FlipTask ft = new FlipTask(ib, getDrawable(R.drawable.icon_cover));
         ft.execute();
         //store the view
@@ -256,7 +285,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 startNewGame();
-                finish();
+                //finish();
             }
         });
 
@@ -275,7 +304,63 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         super.onPause();
         mGamePanel.removeAllViews();
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_game, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.restart_menu){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage("Do you want to restart the game?");
+
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    Toast.makeText(GameActivity.this,"New Game.",Toast.LENGTH_LONG).show();
+                    startNewGame();
+                }
+            });
+
+            alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(GameActivity.this,"Continue.",Toast.LENGTH_LONG).show();
+                    //finish();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }else if(item.getItemId() == R.id.shuffle_menu){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage("Do you want to shuffle the blocks?");
+
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    Toast.makeText(GameActivity.this,"Shuffled.",Toast.LENGTH_LONG).show();
+                    shuffleTheBlocks();
+                }
+            });
+
+            alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(GameActivity.this,"Continue.",Toast.LENGTH_LONG).show();
+                    //finish();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
     /*@Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);

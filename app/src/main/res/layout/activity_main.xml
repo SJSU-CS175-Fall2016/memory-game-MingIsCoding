@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,6 +14,7 @@
     android:background="@android:color/holo_blue_bright">
 
     <TextView
+        android:id="@+id/greeting_txt_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/greeting"
@@ -20,19 +22,20 @@
         android:textSize="25sp"
         android:textStyle="bold" />
     <Button
+        android:id="@+id/start_btn"
         android:text="@string/btn_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="startGame"
+
         android:layout_marginTop="30dp"
         android:textSize="25sp"
         android:background="#ffffff"
         android:textColor="@color/colorPrimary" />
     <Button
+        android:id="@+id/rule_btn"
         android:text="@string/btn_rule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="showRules"
         android:layout_marginTop="30dp"
         android:textSize="25sp"
         android:background="#ffffff"

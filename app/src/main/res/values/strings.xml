@@ -9,4 +9,7 @@
                               3. If the two tiles have matching images, they disappear. The user gets a point.\n
                               4. If the two tiles do NOT have matching images, they flip over to being tiles again.\n
                               5. A game can be resumed if the user come back from other screens.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_fragment">Rules of the Game</string>
 </resources>
